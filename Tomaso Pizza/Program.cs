@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Tomaso_Pizza.Data;
+using Tomaso_Pizza.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 var keyVaultURL = builder.Configuration.GetSection("KeyVault:KeyVaultURL");
@@ -30,6 +31,8 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     options.Password.RequiredLength = 1;
 }).AddEntityFrameworkStores<PizzaContext>()
 .AddDefaultTokenProviders();
+
+builder.Services.AddTransient<IAuthService, AuthService>(); 
 // Add services to the container.
 
 builder.Services.AddControllers();
