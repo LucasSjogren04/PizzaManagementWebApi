@@ -1,4 +1,4 @@
-﻿namespace Tomaso_Pizza.Data.Entities
+﻿namespace Tomaso_Pizza.Data.DTO
 {
     public class LoginUser
     {

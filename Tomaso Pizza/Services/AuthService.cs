@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Tomaso_Pizza.Data.Entities;
+using Tomaso_Pizza.Data.DTO;
 
 namespace Tomaso_Pizza.Services
 {

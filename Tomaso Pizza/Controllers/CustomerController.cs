@@ -7,29 +7,30 @@ namespace Tomaso_Pizza.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController : ControllerBase
+    public class CustomerController(UserManager<IdentityUser> userManager) : ControllerBase
     {
+        private readonly UserManager<IdentityUser> _userManager = userManager;
 
-        [HttpPost]
-        public async Task<IActionResult> CreateOrder()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return Unauthorized();
-            }
+        //[HttpPost]
+        //public async Task<IActionResult> CreateOrder()
+        //{
+        //    var user = await _userManager.GetUserAsync(User);
+        //    if (user == null)
+        //    {
+        //        return Unauthorized();
+        //    }
 
-            var order = new Order
-            {
-                UserId = user.Id,
-                OrderDate = DateTime.UtcNow,
-                // Set additional order properties here
-            };
+        //    var order = new Order
+        //    {
+        //        UserId = user.Id,
+        //        OrderDate = DateTime.UtcNow,
+        //        // Set additional order properties here
+        //    };
 
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
+        //    _context.Orders.Add(order);
+        //    await _context.SaveChangesAsync();
 
-            return Ok(order);
-        }
+        //    return Ok(order);
+        //}
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Tomaso_Pizza.Data.Entities;
+using Tomaso_Pizza.Data.DTO;
 using Tomaso_Pizza.Services;
 
 namespace Tomaso_Pizza.Controllers
