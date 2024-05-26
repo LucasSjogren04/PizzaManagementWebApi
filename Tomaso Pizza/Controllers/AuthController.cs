@@ -28,7 +28,8 @@ namespace Tomaso_Pizza.Controllers
             var result = await _service.Login(user);
             if(result == true)
             {
-                return Ok("Wow");
+                var tokenString = _service.GenerateTokenString(user);
+                return Ok(tokenString);
             }
             return BadRequest();
         }
