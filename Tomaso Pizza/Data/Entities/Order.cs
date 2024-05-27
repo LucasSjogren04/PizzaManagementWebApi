@@ -12,12 +12,12 @@ namespace Tomaso_Pizza.Data.Entities
         [Required]
         public string UserId { get; set; }
 
-        [ForeignKey("UserId")]
+        //[ForeignKey("UserId")]
         public IdentityUser User { get; set; }
 
         public DateTime OrderDate { get; set; }
         public double Price { get; set; }
-        public ICollection<MenuItemOrder> MyProperty { get; set; }
+        public ICollection<MenuItemOrder> MenuItem { get; set; }
 
     }
 }

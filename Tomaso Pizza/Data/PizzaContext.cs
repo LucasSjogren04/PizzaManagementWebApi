@@ -13,11 +13,18 @@ namespace Tomaso_Pizza.Data
         public DbSet<Order> Order { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            base.OnModelCreating(builder);
+
             builder.Entity<MenuItemOrder>()
                 .HasKey(mio => new { mio.MenuItemId, mio.OrderId });
             builder.Entity<MenuItemOrder>()
                 .HasOne(mio => mio.MenuItem)
-                .WithMany();
+                .WithMany(mio => mio.Order)
+                .HasForeignKey(mio => mio.MenuItemId);
+            builder.Entity<MenuItemOrder>()
+                .HasOne(mio => mio.Order)
+                .WithMany(mio => mio.MenuItem)
+                .HasForeignKey(mio => mio.OrderId);
         }
     }
 }
