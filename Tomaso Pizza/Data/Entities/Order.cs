@@ -11,8 +11,6 @@ namespace Tomaso_Pizza.Data.Entities
 
         [Required]
         public string UserId { get; set; }
-
-        //[ForeignKey("UserId")]
         public IdentityUser User { get; set; }
 
         public DateTime OrderDate { get; set; }

@@ -19,11 +19,11 @@ namespace Tomaso_Pizza.Data
                 .HasKey(mio => new { mio.MenuItemId, mio.OrderId });
             builder.Entity<MenuItemOrder>()
                 .HasOne(mio => mio.MenuItem)
-                .WithMany(mio => mio.Order)
+                .WithMany(mi => mi.Order)
                 .HasForeignKey(mio => mio.MenuItemId);
             builder.Entity<MenuItemOrder>()
                 .HasOne(mio => mio.Order)
-                .WithMany(mio => mio.MenuItem)
+                .WithMany(o => o.MenuItem)
                 .HasForeignKey(mio => mio.OrderId);
         }
     }
