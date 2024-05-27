@@ -48,7 +48,7 @@ namespace Tomaso_Pizza.Services
             return await _userManager.CheckPasswordAsync(identityUser, user.Password);
         }
 
-        public async Task<IdentityResult> RegisterUser(RegisterUser registerUser)
+        public async Task<IdentityResult> RegisterUser(RegisterUserDTO registerUser)
         {
             IdentityUser identityUser = new()
             {

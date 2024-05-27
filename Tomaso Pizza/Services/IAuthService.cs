@@ -7,6 +7,6 @@ namespace Tomaso_Pizza.Services
     {
         string GenerateTokenString(LoginUser user);
         Task<bool> Login(LoginUser user);
-        Task<IdentityResult> RegisterUser(RegisterUser registerUser);
+        Task<IdentityResult> RegisterUser(RegisterUserDTO registerUser);
     }
 }
