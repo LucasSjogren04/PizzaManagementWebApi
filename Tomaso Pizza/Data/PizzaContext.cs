@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Tomaso_Pizza.Data.Entities;
 namespace Tomaso_Pizza.Data
@@ -11,6 +12,7 @@ namespace Tomaso_Pizza.Data
         }
         public DbSet<MenuItem> MenuItem { get; set; }
         public DbSet<Order> Order { get; set; }
+        public DbSet<Points> Points { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -25,6 +27,10 @@ namespace Tomaso_Pizza.Data
                 .HasOne(mio => mio.Order)
                 .WithMany(o => o.MenuItem)
                 .HasForeignKey(mio => mio.OrderId);
+
+            builder.Entity<Points>()
+                .HasKey(p => p.Id);
+
         }
     }
 }

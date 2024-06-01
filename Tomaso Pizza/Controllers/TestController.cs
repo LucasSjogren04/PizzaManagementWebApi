@@ -23,11 +23,10 @@ namespace Tomaso_Pizza.Controllers
         {
             var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var roleClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            var user = await _userManager.FindByEmailAsync(emailClaim);
 
             if (emailClaim != null && roleClaim != null)
             {
-                return Ok(new { Id = user.Id, Role = roleClaim });
+                return Ok(new { Email = emailClaim, Role = roleClaim });
             }
 
             return BadRequest("Claims not found.");

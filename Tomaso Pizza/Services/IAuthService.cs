@@ -5,8 +5,9 @@ namespace Tomaso_Pizza.Services
 {
     public interface IAuthService
     {
-        string GenerateTokenString(LoginUser user);
+        Task<string> GenerateTokenString(LoginUser user);
         Task<bool> Login(LoginUser user);
         Task<IdentityResult> RegisterUser(RegisterUserDTO registerUser);
+        
     }
 }

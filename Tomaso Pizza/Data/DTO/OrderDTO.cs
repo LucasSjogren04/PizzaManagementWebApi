@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public DateTime OrderDate { get; set; }
         public double Price { get; set; }
+        public string? Status { get; set; }
         public List<MenuItemOrderDto> MenuItems { get; set; }
     }
 

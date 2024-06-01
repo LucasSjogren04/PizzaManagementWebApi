@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Tomaso_Pizza.Data;
+using Tomaso_Pizza.Data.DTO;
 using Tomaso_Pizza.Services;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,4 +80,42 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    var roles = new[] { "Admin", "RegularUser", "PremiumUser" };
+
+    foreach(var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole(role));
+
+    }
+}
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+    RegisterUserDTO registerAdmin = new()
+    {
+        UserName = "Admin",
+        Password = "Admin123$",
+        Email = "admin@adminmail.com",
+        PhoneNumber = "03898296230923"
+
+    };
+    if(await userManager.FindByEmailAsync(registerAdmin.Email) == null)
+    {
+        IdentityUser user = new()
+        {
+            UserName = registerAdmin.UserName,
+            Email = registerAdmin.Email,
+            PhoneNumber = registerAdmin.PhoneNumber
+        };
+        await userManager.CreateAsync(user, registerAdmin.Password);
+            
+        await userManager.AddToRoleAsync(user, "Admin");
+    }
+}
 app.Run();

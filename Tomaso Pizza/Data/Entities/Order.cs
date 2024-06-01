@@ -15,6 +15,7 @@ namespace Tomaso_Pizza.Data.Entities
 
         public DateTime OrderDate { get; set; }
         public double Price { get; set; }
+        public string? Status { get; set; }
         public ICollection<MenuItemOrder> MenuItem { get; set; }
 
     }

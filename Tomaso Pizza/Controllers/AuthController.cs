@@ -27,13 +27,19 @@ namespace Tomaso_Pizza.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginUser user)
         {
-            var result = await _service.Login(user);
-            if(result == true)
+            string token = await _service.GenerateTokenString(user);
+            if(token != "Unable to authenticate")
             {
-                var tokenString = _service.GenerateTokenString(user);
-                return Ok(tokenString);
+                return Ok(token);
             }
-            return BadRequest();
+            return BadRequest(token);
+            //var result = await _service.Login(user);
+            //if(result == true)
+            //{
+            //    var tokenString = _service.GenerateTokenString(user);
+            //    return Ok(tokenString);
+            //}
+            //return BadRequest();
         }
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] UpdateUserDTO.ChangePasswordModel model)
