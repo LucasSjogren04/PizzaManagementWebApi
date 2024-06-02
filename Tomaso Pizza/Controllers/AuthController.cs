@@ -33,13 +33,7 @@ namespace Tomaso_Pizza.Controllers
                 return Ok(token);
             }
             return BadRequest(token);
-            //var result = await _service.Login(user);
-            //if(result == true)
-            //{
-            //    var tokenString = _service.GenerateTokenString(user);
-            //    return Ok(tokenString);
-            //}
-            //return BadRequest();
+
         }
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] UpdateUserDTO.ChangePasswordModel model)

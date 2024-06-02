@@ -44,6 +44,34 @@ namespace Tomaso_Pizza.Controllers
 
 
         }
+        [HttpPost("CreateFoodItem")]
+        public async Task<IActionResult> CreateFoodItem([FromBody] FoodItemDTO food)
+        {
+            MenuItem item = new()
+            {
+                Name = food.Name,
+                Price = food.Price,
+                Description = food.Description,
+                Ingredients = food.Ingredients,
+                Category = food.Category
+            };
+            _context.MenuItem.Add(item);
+            await _context.SaveChangesAsync();
+
+            return Ok("Menu item created successfully.");
+        }
+        [HttpPut("EditFoodItem")]
+        public async Task<IActionResult> EditFoodItem(int id, string newIngredients)
+        {
+            MenuItem? menuItem = await _context.MenuItem.Where(mi => mi.Id == id).FirstOrDefaultAsync();
+            if (menuItem == null)
+                return BadRequest("Menu Item doesn't exist");
+
+            menuItem.Ingredients = newIngredients;
+            await _context.SaveChangesAsync();
+
+            return Ok("Menu item created successfully.");
+        }
         [HttpGet("GetAllOrders")]
         public async Task<IActionResult> GetAllOrders()
         {

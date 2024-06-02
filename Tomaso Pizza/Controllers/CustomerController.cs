@@ -13,11 +13,12 @@ namespace Tomaso_Pizza.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController(UserManager<IdentityUser> userManager, PizzaContext context, IAuthService authService) : ControllerBase
+    public class CustomerController(UserManager<IdentityUser> userManager, PizzaContext context, IAuthService authService, ICustomerService customerService) : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly PizzaContext _context = context;
         private readonly IAuthService _authService = authService;
+        private readonly ICustomerService _customerService = customerService;
 
         [Authorize]
         [HttpPost("CreateOrder")]
@@ -30,142 +31,33 @@ namespace Tomaso_Pizza.Controllers
 
             string? claimedRole = User.FindFirstValue(ClaimTypes.Role);
             string? email = User.FindFirstValue(ClaimTypes.Email);
+            
             if (claimedRole == null || email == null)
                 return BadRequest("Invalid Token");
 
-            IdentityUser? user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
+            (IdentityUser? user, bool tokenAuthenticated) = await _authService.AuthenticateUserClaim(claimedRole, email);
+            if(tokenAuthenticated == false || user == null)
                 return BadRequest("Invalid Token");
 
-            IList<string> roles = await _userManager.GetRolesAsync(user);
-            if (roles[0] != claimedRole)
+            if (claimedRole == "PremiumUser")
             {
-                return BadRequest("Token out of date");
+                OrderRQResult premOrderRQresult =  await _customerService.PremiumOrder(user, orderRequest);
+                if(premOrderRQresult.Succeeded == true)
+                {
+                    return Ok(premOrderRQresult);
+                }
+                return BadRequest(premOrderRQresult);
             }
+            OrderRQResult regOrderRQresult = await _customerService.RegularOrder(user, orderRequest);
 
-            if (roles[0] == "PremiumUser")
-            {
-                Points? points = await _context.Points.Where(p => p.UserId == user.Id).FirstOrDefaultAsync();
-                if (points == null)
-                    return BadRequest("Unable to proccess request");
-                
-                int itemsOrdered = 0;
-               
-                var premiumOrder = new Order
-                {
-                    UserId = user.Id,
-                    OrderDate = DateTime.UtcNow,
-                    Price = 0, // Calculate this later
-                    Status = "Order recieved",
-                    MenuItem = new List<MenuItemOrder>()
-                };
-
-                List<double> prices = new();
-                foreach (var itemRequest in orderRequest.Items)
-                {
-                    var menuItem = await _context.MenuItem.FindAsync(itemRequest.FoodItemId);
-                    if (menuItem == null)
-                    {
-                        return NotFound($"MenuItem with ID {itemRequest.FoodItemId} not found.");
-                    }
-                    prices.Add(menuItem.Price);
-
-                    var menuItemOrder = new MenuItemOrder
-                    {
-                        MenuItemId = itemRequest.FoodItemId,
-                        Quantity = itemRequest.Quantity,
-                        Order = premiumOrder
-                    };
-
-                    premiumOrder.MenuItem.Add(menuItemOrder);
-                    premiumOrder.Price += menuItem.Price * itemRequest.Quantity;
-                    itemsOrdered += itemRequest.Quantity;
-                    itemsOrdered += itemRequest.Quantity;
-                }
-
-                DiscountsAppliedDTO discountsAppliedDTO = new();
-
-
-                if (points.PointsCount >= 100)
-                {
-                    double cheapestItemPrice = prices.OrderBy(prices => prices).First();
-
-                    premiumOrder.Price -= cheapestItemPrice;
-                    
-                    discountsAppliedDTO.Used100PointDiscount = true;
-                    discountsAppliedDTO.MoneySaved += cheapestItemPrice;
-                }
-
-                if(itemsOrdered >= 3)
-                {
-
-                    premiumOrder.Price *= 0.8;
-                    discountsAppliedDTO.MoneySaved += premiumOrder.Price * 0.2;
-                    discountsAppliedDTO.TwentyPercent = true;
-                }
-
-                points.PointsCount += itemsOrdered * 10; 
-
-                _context.Order.Add(premiumOrder);
-                await _context.SaveChangesAsync();
-
-                return Ok(discountsAppliedDTO);
-            }
-            var order = new Order
-            {
-                UserId = user.Id,
-                OrderDate = DateTime.UtcNow,
-                Price = 0, // Calculate this later
-                Status = "Order recieved",
-                MenuItem = new List<MenuItemOrder>()
-            };
-
-            foreach (var itemRequest in orderRequest.Items)
-            {
-                var menuItem = await _context.MenuItem.FindAsync(itemRequest.FoodItemId);
-                if (menuItem == null)
-                {
-                    return NotFound($"MenuItem with ID {itemRequest.FoodItemId} not found.");
-                }
-
-                var menuItemOrder = new MenuItemOrder
-                {
-                    MenuItemId = itemRequest.FoodItemId,
-                    Quantity = itemRequest.Quantity,
-                    Order = order
-                };
-
-                order.MenuItem.Add(menuItemOrder);
-                order.Price += menuItem.Price * itemRequest.Quantity;
-            }
-
-            _context.Order.Add(order);
-            await _context.SaveChangesAsync();
-
-            return Ok("Order created successfully.");
+            return Ok(regOrderRQresult);
         }
-
-        [HttpPost("CreateFoodItem")]
-        public async Task<IActionResult> CreateFoodItem([FromBody] FoodItemDTO food)
-        {
-            MenuItem item = new()
-            {
-                Name = food.Name,
-                Price = food.Price,
-                Description = food.Description,
-                Ingredients = food.Ingredients,
-                Category = food.Category
-            };
-            _context.MenuItem.Add(item);
-            await _context.SaveChangesAsync();
-
-            return Ok("Order created successfully.");
-        }
+        
         
         [HttpGet("GetAllMenuItimes")]
         public async Task<IActionResult> GetAllMenuItimes()
         {
-            List<MenuItem> menuItems = [.. _context.MenuItem];
+            List<MenuItem> menuItems = await _context.MenuItem.ToListAsync();
 
             return Ok(menuItems);
         }

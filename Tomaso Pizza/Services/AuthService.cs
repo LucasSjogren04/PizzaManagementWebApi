@@ -52,7 +52,19 @@ namespace Tomaso_Pizza.Services
             string tokenString = new JwtSecurityTokenHandler().WriteToken(securityToken);
             return tokenString;
         }
+        public async Task<(IdentityUser?, bool)> AuthenticateUserClaim(string claimedRole, string email)
+        {
+            IdentityUser? user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return (user, false);
 
+            IList<string> roles = await _userManager.GetRolesAsync(user);
+            if (roles[0] != claimedRole)
+            {
+                return (user, false);
+            }
+            return (user, false);
+        }
         public async Task<bool> Login(LoginUser user)
         {
             var identityUser = await _userManager.FindByEmailAsync(user.Email);
